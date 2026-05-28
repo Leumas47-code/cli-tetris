@@ -32,7 +32,9 @@ piece_row = 0
 piece_col = 5
 key = ""
 right_pressed = False
+right_previous_pressed = False
 left_pressed = False
+left_previous_pressed = False
 time.sleep(game_interval) # not sure what for, but scared to remove
 
 def render_window(frame):
@@ -64,28 +66,61 @@ def lateral_movement(key, frame, piece_row, piece_col): # just for coords change
             frame[piece_row][piece_col] = 1
     return piece_col
 
-def take_input(key): # total shit, need to add single key presses
-
+def take_input(key, right_pressed, left_pressed): # total shit, need to add single key presses
     if keyboard.is_pressed("left"):
         key = "left"
+        left_pressed = True
     if keyboard.is_pressed("right"):
         key = "right"
+        right_pressed = True
     if keyboard.is_pressed("esc"):
         key = "esc"
-    return key
+    return key, left_pressed, right_pressed
 
 # Do I gotta add all arguments or nah??
-def game_loop(key, frame, piece_row, piece_col, game_interval, falling_interval, last_grav_time):
+def game_loop(key, frame, piece_row, piece_col, 
+              game_interval, falling_interval, 
+              last_grav_time, right_pressed, 
+              left_pressed, right_previous_pressed, 
+              left_previous_pressed):
     while piece_row < 19 and frame[piece_row + 1][piece_col] != 1:
         current_time = time.time() # to do: gotta make this grav loop into a function
         difference = current_time - last_grav_time
         render_window(frame)
-        key = take_input(key) # no clue what variable this actually is
-        if difference >= falling_interval:
-             piece_row = vertical_movement(frame, piece_row, piece_col, falling_interval)
-             piece_col = lateral_movement(key, frame, piece_row, piece_col)
-             last_grav_time = current_time
-        
+        key, right_pressed, left_pressed = take_input(key, right_pressed, left_pressed) # no clue what variable this actually is
+
+        single_right = (right_pressed == True and right_previous_pressed == False)
+        held_right = (right_pressed == True and right_previous_pressed == True)
+        single_left = (left_pressed == True and left_previous_pressed == False)
+        held_left = (left_pressed == True and left_previous_pressed == True)
+
+        if single_right:  
+            if difference >= falling_interval:
+                piece_row = vertical_movement(frame, piece_row, piece_col, falling_interval)
+                piece_col = lateral_movement(key, frame, piece_row, piece_col)
+                last_grav_time = current_time
+            right_previous_pressed = right_pressed
+        if single_left:
+            if difference >= falling_interval:
+                piece_row = vertical_movement(frame, piece_row, piece_col, falling_interval)
+                piece_col = lateral_movement(key, frame, piece_row, piece_col)
+                last_grav_time = current_time
+            left_previous_pressed = left_pressed
+        if held_right:
+            while held_right:
+                if difference >= falling_interval:
+                    piece_row = vertical_movement(frame, piece_row, piece_col, falling_interval)
+                    piece_col = lateral_movement(key, frame, piece_row, piece_col)
+                    last_grav_time = current_time
+                right_previous_pressed = right_pressed
+        if held_left:
+            while held_left:
+                if difference >= falling_interval:
+                    piece_row = vertical_movement(frame, piece_row, piece_col, falling_interval)
+                    piece_col = lateral_movement(key, frame, piece_row, piece_col)
+                    last_grav_time = current_time
+                left_previous_pressed = left_pressed
+
         time.sleep(game_interval)  
         print("\033[H", end="") # Note to self: learn this shit
     return last_grav_time
@@ -93,4 +128,8 @@ def game_loop(key, frame, piece_row, piece_col, game_interval, falling_interval,
         
 
 while True:
-    game_loop(key, frame, piece_row, piece_col, game_interval, falling_interval, last_grav_time)
+    game_loop(key, frame, piece_row, piece_col, 
+              game_interval, falling_interval, 
+              last_grav_time, right_pressed, 
+              left_pressed, right_previous_pressed, 
+              left_previous_pressed)
