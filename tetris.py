@@ -1,5 +1,4 @@
 import time
-import random as rd
 import keyboard
 
 frame = [
@@ -30,7 +29,7 @@ game_interval = 0.001
 last_grav_time = time.time()
 falling_interval = 0.1
 piece_row = 0 
-piece_col = rd.randint(0, len(frame[0]) - 1)
+piece_col = 5
 key = ""
 right_pressed = False
 left_pressed = False
@@ -65,20 +64,18 @@ def lateral_movement(key, frame, piece_row, piece_col): # just for coords change
             frame[piece_row][piece_col] = 1
     return piece_col
 
-def take_input(key, right_pressed, left_pressed): # total shit, need to add single key presses
+def take_input(key): # total shit, need to add single key presses
 
     if keyboard.is_pressed("left"):
-        left_pressed = True 
         key = "left"
     if keyboard.is_pressed("right"):
-        right_pressed = True
         key = "right"
     if keyboard.is_pressed("esc"):
         key = "esc"
-    return key, right_pressed, left_pressed
+    return key
 
 # Do I gotta add all arguments or nah??
-def game_loop(key, frame, piece_row, piece_col, game_interval, falling_interval, last_grav_time, right_pressed, left_pressed):
+def game_loop(key, frame, piece_row, piece_col, game_interval, falling_interval, last_grav_time):
     while piece_row < 19 and frame[piece_row + 1][piece_col] != 1:
         current_time = time.time() # to do: gotta make this grav loop into a function
         difference = current_time - last_grav_time
@@ -96,6 +93,4 @@ def game_loop(key, frame, piece_row, piece_col, game_interval, falling_interval,
         
 
 while True:
-    game_loop(key, frame, piece_row, rd.randint(0, len(frame[0]) - 1), game_interval, falling_interval, last_grav_time)
-
-# to do: remove random module cuz tetris blocks start at middle: len(frame[0])/2
+    game_loop(key, frame, piece_row, piece_col, game_interval, falling_interval, last_grav_time)
