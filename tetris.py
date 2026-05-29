@@ -106,8 +106,8 @@ def game_loop(key, frame, piece_row, piece_col,
                 piece_col = lateral_movement(key, frame, piece_row, piece_col)
                 last_grav_time = current_time
             left_previous_pressed = left_pressed
-        if held_right:
-            while held_right:
+        if held_right: # Does not trigger at same time as line 97 because conditions are different
+            while held_right: 
                 if difference >= falling_interval:
                     piece_row = vertical_movement(frame, piece_row, piece_col, falling_interval)
                     piece_col = lateral_movement(key, frame, piece_row, piece_col)
