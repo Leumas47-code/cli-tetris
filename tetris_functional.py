@@ -55,12 +55,12 @@ def vertical_movement(frame, piece_row, piece_col):
     return piece_row
 
 def lateral_movement(right_pressed, left_pressed, frame, piece_row, piece_col): # Horizontal movement
-    if piece_col != 9 and frame[piece_row + 1][piece_col] != 1:
+    if piece_col != 9 or frame[piece_row + 1][piece_col] != 1:
         if right_pressed:
             piece_col += 1
             frame[piece_row][piece_col - 1] = 0
             frame[piece_row][piece_col] = 1
-    if piece_col != 0 and frame[piece_row + 1][piece_col] != 1:
+    if piece_col != 0 or frame[piece_row + 1][piece_col] != 1:
         if left_pressed:
             piece_col -= 1
             frame[piece_row][piece_col + 1] = 0
