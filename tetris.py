@@ -8,7 +8,6 @@ class TetrisGame:
         self.falling_interval = 0.1
         self.piece_row = 0
         self.piece_col = 5 # Center column
-        self.key = "" # Default before input
         self.right_pressed = False
         self.right_previous_pressed = False
         self.left_pressed = False
@@ -24,6 +23,13 @@ class TetrisGame:
                     line += "[ ]"
             print(line)
     
+    def take_input(self):
+        if keyboard.is_pressed("left"):
+            self.left_pressed = True
+        if keyboard.is_pressed("right"):
+            self.right_pressed = True
+        return self.right_pressed, self.left_pressed
+
     def vertical_movement(self):
         self.piece_row += 1
         self.frame[self.piece_row - 1][self.piece_col] = 0
@@ -48,7 +54,7 @@ class TetrisGame:
             current_time = time.time() # to do: gotta make this grav loop into a function
             difference = current_time - self.last_grav_time
             self.render_window(self.frame)
-            self.key, self.left_pressed, self.right_pressed = self.take_input(self.key, self.left_pressed, self.right_pressed)
+            self.left_pressed, self.right_pressed = self.take_input(self.left_pressed, self.right_pressed)
 
             
 
