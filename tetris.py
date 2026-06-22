@@ -6,12 +6,15 @@ class TetrisGame:
         self.frame = [[0] * 10 for _ in range(20)] # Loop to create fram
         self.game_interval = 0.001
         self.falling_interval = 0.1
+        self.move_interval = 0.1
         self.piece_row = 0
         self.piece_col = 5 # Center column
         self.right_pressed = False
         self.right_previous_pressed = False
         self.left_pressed = False
         self.left_previous_pressed = False
+        self.last_grav_time = time.time()
+        self.last_move_time = time.time()
     
     def render_window(self):
         for row in self.frame:
@@ -48,8 +51,16 @@ class TetrisGame:
                 self.piece_col += 1
                 self.frame[self.piece_row][self.piece_col - 1] = 0
                 self.frame[self.piece_row][self.piece_col] = 1
+            elif held_right:
+                self.piece_col += 1
+                self.frame[self.piece_row][self.piece_col - 1] = 0
+                self.frame[self.piece_row][self.piece_col] = 1
         if self.piece_col != 0 and self.frame[self.piece_row + 1][self.piece_col] != 1:
-            if self.single_left:
+            if single_left:
+                self.piece_col -= 1
+                self.frame[self.piece_row][self.piece_col + 1] = 0
+                self.frame[self.piece_row][self.piece_col] = 1
+            if held_left:
                 self.piece_col -= 1
                 self.frame[self.piece_row][self.piece_col + 1] = 0
                 self.frame[self.piece_row][self.piece_col] = 1
@@ -61,17 +72,23 @@ class TetrisGame:
     def game_loop(self):
         while self.piece_row < 19 and self.frame[self.piece_row + 1][self.piece_col] != 1:
             current_time = time.time() # to do: gotta make this grav loop into a function
-            difference = current_time - self.last_grav_time
+            fall_difference = current_time - self.last_grav_time
+            move_difference = current_time - self.last_move_time
             self.render_window(self.frame)
             self.left_pressed, self.right_pressed = self.take_input(self.left_pressed, self.right_pressed)
 
-            if difference >= self.falling_interval:
-                self.piece_row = self.vertical_movement(self.frame, self.piece_row, self.piece_col)
-                self.last_grav_time = current_time
+            if fall_difference >= self.falling_interval:
+                self.piece_row = self.vertical_movement()
+                self.last_grav_time = time.time()
+
+            if move_difference >= self.move_interval:
+                self.piece_col = self.lateral_movement()
+                self.last_move_time = time.time()
 
             time.sleep(self.game_interval)  
             print("\033[H", end="") # Note to self: learn this shit
-        return self.last_grav_time
+        return self.last_grav_time, self.last_move_time
+
         
 while True:
     game = TetrisGame()
