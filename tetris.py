@@ -38,35 +38,17 @@ class TetrisGame:
         self.frame[self.piece_row - 1][self.piece_col] = 0
         self.frame[self.piece_row][self.piece_col] = 1
         return self.piece_row
+    
+    def move_right(self):
+        self.piece_col += 1
+        self.frame[self.piece_row][self.piece_col - 1] = 0
+        self.frame[self.piece_row][self.piece_col] = 1
+        return self.piece_col
 
-    def lateral_movement(self): # Horizontal movement
-        
-        single_right = (self.right_pressed and not self.right_previous_pressed)
-        held_right = (self.right_pressed and self.right_previous_pressed)
-        single_left = (self.left_pressed and not self.left_previous_pressed)
-        held_left = (self.left_pressed and self.left_previous_pressed)
-
-        if self.piece_col != 9 and self.frame[self.piece_row + 1][self.piece_col] != 1:
-            if single_right:
-                self.piece_col += 1
-                self.frame[self.piece_row][self.piece_col - 1] = 0
-                self.frame[self.piece_row][self.piece_col] = 1
-            elif held_right:
-                self.piece_col += 1
-                self.frame[self.piece_row][self.piece_col - 1] = 0
-                self.frame[self.piece_row][self.piece_col] = 1
-        if self.piece_col != 0 and self.frame[self.piece_row + 1][self.piece_col] != 1:
-            if single_left:
-                self.piece_col -= 1
-                self.frame[self.piece_row][self.piece_col + 1] = 0
-                self.frame[self.piece_row][self.piece_col] = 1
-            if held_left:
-                self.piece_col -= 1
-                self.frame[self.piece_row][self.piece_col + 1] = 0
-                self.frame[self.piece_row][self.piece_col] = 1
-
-        self.right_previous_pressed = self.right_pressed
-        self.left_previous_pressed = self.left_pressed
+    def move_left(self):
+        self.piece_col -= 1
+        self.frame[self.piece_row][self.piece_col + 1] = 0
+        self.frame[self.piece_row][self.piece_col] = 1
         return self.piece_col
     
     def game_loop(self):
@@ -81,14 +63,13 @@ class TetrisGame:
                 self.piece_row = self.vertical_movement()
                 self.last_grav_time = time.time()
 
-            if move_difference >= self.move_interval:
+            if (move_difference >= self.move_interval):
                 self.piece_col = self.lateral_movement()
                 self.last_move_time = time.time()
 
             time.sleep(self.game_interval)  
             print("\033[H", end="") # Note to self: learn this shit
         return self.last_grav_time, self.last_move_time
-
         
 while True:
     game = TetrisGame()
