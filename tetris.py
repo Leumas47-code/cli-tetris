@@ -42,7 +42,7 @@ class TetrisGame:
         self.frame[self.piece_row][self.piece_col] = 1
         return self.piece_row
     
-    def move_right(self):
+    def move_right(self): # Bound conditions moved here to separate piece state from horizontal()
         if self.piece_col >= 9:
             return self.piece_col
         if (self.frame[self.piece_row][self.piece_col + 1] == 1):
@@ -88,6 +88,13 @@ class TetrisGame:
     
     def game_loop(self):
         while self.piece_row < 19 and self.frame[self.piece_row + 1][self.piece_col] != 1:
+            if self.piece_row >= 19 or self.frame[self.piece_row + 1][self.piece_col] == 1:
+                self.right_previous_pressed = self.right_pressed
+                self.left_previous_pressed = self.left_pressed
+                time.sleep(self.game_interval)
+                print("\033[H", end="")
+                return self.last_grav_time, self.last_move_time_left, self.last_move_time_right
+            
             current_time = time.time() # to do: gotta make this grav loop into a function
             fall_difference = current_time - self.last_grav_time
             self.render_window()
